@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "9563329b-020e-4cf5-9d58-c44186a4303b",
+		"name": "Rewards",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34313444",
+		"_collection_link": "https://web.postman.co/workspace/backend~0d4961b7-9e88-41a2-84be-4c8141792030/collection/34313444-9563329b-020e-4cf5-9d58-c44186a4303b?source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Get Rewards",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Create Reward",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXJhbW9jb3NtZXRpY3NAdGVzdC5jb20iLCJpYXQiOjE3NjEyMzA4NTcsImV4cCI6MTc2MTMxNzI1N30.dVAQ2WuPeYexkcAWg5ghXl8SA4TWDx5bFlrn4vp9a8Y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"puntosNecesarios\": 100,\n\"mensajeProgreso\": \"Sigue asi!\",\n\"negocioId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/rewards",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"rewards"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get By Id",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Get business Config Reward",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXJhbW9jb3NtZXRpY3NAdGVzdC5jb20iLCJpYXQiOjE3NjEyMzA4NTcsImV4cCI6MTc2MTMxNzI1N30.dVAQ2WuPeYexkcAWg5ghXl8SA4TWDx5bFlrn4vp9a8Y",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/rewards/business/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"rewards",
+						"business",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Rewards",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXJhbW9jb3NtZXRpY3NAdGVzdC5jb20iLCJpYXQiOjE3NjEyMzA4NTcsImV4cCI6MTc2MTMxNzI1N30.dVAQ2WuPeYexkcAWg5ghXl8SA4TWDx5bFlrn4vp9a8Y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\"puntosNecesarios\": 200,\n\"mensajeProgreso\": \"Casi llegas!\",\n\"negocioId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/rewards/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"rewards",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Reward Config",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwYXJhbW9jb3NtZXRpY3NAdGVzdC5jb20iLCJpYXQiOjE3NjEyMzA4NTcsImV4cCI6MTc2MTMxNzI1N30.dVAQ2WuPeYexkcAWg5ghXl8SA4TWDx5bFlrn4vp9a8Y",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/rewards/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"rewards",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,129 @@
+{
+	"info": {
+		"_postman_id": "1e1de8f7-1806-4b69-9b99-f87b4b9d123d",
+		"name": "Users",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34313444",
+		"_collection_link": "https://web.postman.co/workspace/backend~0d4961b7-9e88-41a2-84be-4c8141792030/collection/34313444-1e1de8f7-1806-4b69-9b99-f87b4b9d123d?source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Get all",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET BY ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Alumno 5\",\n    \"lastName\": \"Estudiante\",\n    \"age\": 18,\n    \"dni\": \"1234\",\n    \"course\": \"A3\",\n    \"note\": 10\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer <eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWVtcHJlc2FAdGVzdC5jb20iLCJpYXQiOjE3NjA4MTkzOTIsImV4cCI6MTc2MDkwNTc5Mn0.yljz0hpGgtY6be-XZmB1gwage2JJACW7xi4aB56sOMw>",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Juan Pérez\",\n  \"email\": \"juan@test.com\",\n  \"telefono\": \"1234567890\",\n  \"puntos\": 0,\n  \"businessId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Alumno 5\",\n    \"lastName\": \"Estudiante\",\n    \"age\": 18,\n    \"dni\": \"1234\",\n    \"course\": \"A3\",\n    \"note\": 10\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

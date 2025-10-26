@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "31ee5196-2c38-469f-aa5d-a468d6a83129",
+		"name": "JWT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34313444",
+		"_collection_link": "https://web.postman.co/workspace/backend~0d4961b7-9e88-41a2-84be-4c8141792030/collection/34313444-31ee5196-2c38-469f-aa5d-a468d6a83129?source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Create Business",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"miempresa@test.com\",\n    \"password\": \"12345\",\n    \"nombre\": \"qchingon\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Business",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtaWVtcHJlc2FAdGVzdC5jb20iLCJpYXQiOjE3NjA4MTkzOTIsImV4cCI6MTc2MDkwNTc5Mn0.yljz0hpGgtY6be-XZmB1gwage2JJACW7xi4aB56sOMw",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
