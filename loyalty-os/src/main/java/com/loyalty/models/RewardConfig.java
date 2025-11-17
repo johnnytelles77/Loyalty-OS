@@ -21,4 +21,8 @@ public class RewardConfig {
 
     @Schema(description="ID del negocio propietario")
     private Long negocioId;
+    
+    @ManyToOne
+    @JoinColumn(name="business_id")
+    private Business negocio;
 }

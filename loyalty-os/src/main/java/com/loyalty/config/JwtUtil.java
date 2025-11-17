@@ -19,6 +19,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    // Generar token incluyendo email y businessId
     public String generateToken(String email) {
         return Jwts.builder()
             .setSubject(email)
@@ -28,15 +29,35 @@ public class JwtUtil {
             .compact();
     }
 
+    // Extraer email del token
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
-            .setSigningKey(getSigningKey())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
+    // Extraer ID del negocio del token
+    public Long extractBusinessId(String token) {
+        Object id = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("id");
+
+        if (id instanceof Integer) {
+            return ((Integer) id).longValue();
+        } else if (id instanceof Long) {
+            return (Long) id;
+        } else {
+            throw new IllegalArgumentException("No se pudo extraer el ID del token");
+        }
+    }
+
+    // Validar token comparando el email
     public boolean validateToken(String token, String email) {
         return extractEmail(token).equals(email);
     }

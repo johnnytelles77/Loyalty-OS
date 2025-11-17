@@ -1,11 +1,19 @@
 package com.loyalty.dtos;
 
+import com.loyalty.models.RewardConfig;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class RewardConfigDTO {
-    private Integer puntosNecesarios;
+    private int puntosNecesarios;
     private String mensajeProgreso;
-    private Long negocioId;
-}
 
+    public static RewardConfigDTO from(RewardConfig config) {
+        return RewardConfigDTO.builder()
+                .puntosNecesarios(config.getPuntosNecesarios())
+                .mensajeProgreso(config.getMensajeProgreso())
+                .build();
+    }
+}

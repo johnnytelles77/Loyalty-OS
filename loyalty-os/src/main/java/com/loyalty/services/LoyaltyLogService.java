@@ -76,4 +76,28 @@ public class LoyaltyLogService {
         }
         logRepository.deleteById(logId);
     }
+    
+    public List<LoyaltyLog> getLogsByBusiness(Long negocioId) {
+        return logRepository.findByUserNegocioId(negocioId);
+    }
+
+    public long getTotalLogsByBusiness(Long negocioId) {
+        return logRepository.countByUserNegocioId(negocioId);
+    }
+
+    public int getTotalPointsByBusiness(Long negocioId) {
+        List<LoyaltyLog> logs = logRepository.findByUserNegocioId(negocioId);
+        return logs.stream()
+                .filter(log -> "ASIGNACION".equalsIgnoreCase(log.getTipo()))
+                .mapToInt(LoyaltyLog::getCantidad)
+                .sum();
+    }
+
+    public int getTotalPointsRedeemedByBusiness(Long negocioId) {
+        List<LoyaltyLog> logs = logRepository.findByUserNegocioId(negocioId);
+        return logs.stream()
+                .filter(log -> "CANJE".equalsIgnoreCase(log.getTipo()))
+                .mapToInt(LoyaltyLog::getCantidad)
+                .sum();
+    }
     }

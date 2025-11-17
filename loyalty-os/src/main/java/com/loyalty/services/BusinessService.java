@@ -2,11 +2,17 @@ package com.loyalty.services;
 
 import com.loyalty.models.Business;
 import com.loyalty.repositories.BusinessRepository;
+import com.loyalty.utils.Mapper;
+import com.loyalty.config.JwtUtil;
 import com.loyalty.dtos.BusinessDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import org.springframework.beans.factory.annotation.Value;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +26,13 @@ public class BusinessService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
+
 
     // Crear un nuevo negocio
     public Business saveBusiness(BusinessDTO dto) {
@@ -39,6 +52,17 @@ public class BusinessService {
     // Obtener negocio por email
     public Business getByEmail(String email) {
         return businessRepository.findByEmail(email);
+    }
+    
+    public BusinessDTO getAuthenticatedBusiness(String token) {
+        String email = jwtUtil.extractEmail(token);
+        Business business = getByEmail(email);
+
+        if (business == null) {
+            throw new IllegalArgumentException("Negocio no encontrado para el token");
+        }
+
+        return Mapper.toBusinessDTO(business);
     }
 
     // Obtener negocio por ID
@@ -66,9 +90,43 @@ public class BusinessService {
             throw new RuntimeException("Business not found with id: " + id);
         }
     }
+    
+    public Long extractBusinessIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(jwtSecret.getBytes())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        return Long.parseLong(claims.getSubject()); // Asegúrate de que el ID esté en el "sub"
+    }
+    
+    public String extractEmailFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+            .setSigningKey(jwtSecret.getBytes())
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+
+        return claims.getSubject(); // Ahora el subject es el email
+    }
+
+
 
     // Eliminar negocio
     public void deleteBusiness(Long id) {
         businessRepository.deleteById(id);
+    }
+    
+    // Get Authenticated
+    public Business getAuthenticatedBusinessEntity(String token) {
+        String email = jwtUtil.extractEmail(token);
+        Business business = getByEmail(email);
+
+        if (business == null) {
+            throw new IllegalArgumentException("Negocio no encontrado para el token");
+        }
+
+        return business;
     }
 }

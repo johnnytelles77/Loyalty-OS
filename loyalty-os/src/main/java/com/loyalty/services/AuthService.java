@@ -1,6 +1,6 @@
 package com.loyalty.services;
 
-import com.loyalty.dtos.BusinessDTO;
+import com.loyalty.dtos.BusinessRegisterDTO;
 import com.loyalty.models.Business;
 import com.loyalty.repositories.BusinessRepository;
 import com.loyalty.config.JwtUtil;
@@ -20,8 +20,8 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Registro: devuelve token directamente
-    public String register(BusinessDTO dto) {
+    // Registro
+    public String register(BusinessRegisterDTO dto) {
         if (businessRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("Email ya existe");
         }
@@ -30,6 +30,7 @@ public class AuthService {
         business.setEmail(dto.getEmail());
         business.setNombre(dto.getNombre());
         business.setPassword(passwordEncoder.encode(dto.getPassword()));
+        business.setRole(dto.getRole());
 
         businessRepository.save(business);
 
@@ -37,7 +38,7 @@ public class AuthService {
         return jwtUtil.generateToken(dto.getEmail());
     }
 
-    // Login: valida credenciales y devuelve token
+    // Login
     public String login(String email, String password) {
         Business business = businessRepository.findByEmail(email);
         if (business == null || !passwordEncoder.matches(password, business.getPassword())) {

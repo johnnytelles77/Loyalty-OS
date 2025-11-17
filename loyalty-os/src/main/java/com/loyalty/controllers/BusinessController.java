@@ -12,6 +12,7 @@ import com.loyalty.dtos.BusinessDTO;
 import com.loyalty.models.Business;
 import com.loyalty.services.BusinessService;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.*;
 import io.swagger.v3.oas.annotations.responses.*;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/businesses")
 @Tag(name = "Gestión de Negocios", description = "Endpoints para gestionar los negocios registrados")
+@CrossOrigin(origins = "*")
 public class BusinessController {
 
     @Autowired
@@ -63,7 +65,7 @@ public class BusinessController {
             content = @Content(mediaType = "application/json", 
                 schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Business> getBusinessById(@PathVariable Long id) {
         try {
             Business business = businessService.getById(id);
@@ -148,6 +150,44 @@ public class BusinessController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // 500
         }
     }
+    
+    @Operation(summary = "Obtener el negocio autenticado usando el token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Negocio autenticado obtenido correctamente",
+            content = { @Content(mediaType = "application/json",
+                schema = @Schema(implementation = Business.class)) }),
+        @ApiResponse(responseCode = "401", description = "No autorizado o token inválido",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping("/me")
+    public ResponseEntity<?> getAuthenticatedBusiness(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("Token faltante o inválido");
+            }
+
+            String token = authHeader.substring(7);
+            BusinessDTO businessDTO = businessService.getAuthenticatedBusiness(token);
+
+            return ResponseEntity.ok(businessDTO);
+
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Token expirado");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Negocio no encontrado o token inválido");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error interno del servidor");
+        }
+    }
+
 
     @Operation(summary = "Eliminar un negocio por su ID")
     @ApiResponses(value = {

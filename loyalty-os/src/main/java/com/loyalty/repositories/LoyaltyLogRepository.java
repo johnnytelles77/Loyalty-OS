@@ -8,6 +8,13 @@ import java.util.List;
 
 @Repository
 public interface LoyaltyLogRepository extends JpaRepository<LoyaltyLog, Long> {
-    List<LoyaltyLog> findByUserId(Long userId); // historial por cliente
-}
 
+    // Historial de movimientos de un cliente
+    List<LoyaltyLog> findByUserId(Long userId);
+
+    // Historial de movimientos para todos los usuarios de un negocio
+    List<LoyaltyLog> findByUserNegocioId(Long negocioId);
+
+    // Contar logs por negocio
+    long countByUserNegocioId(Long negocioId);
+}

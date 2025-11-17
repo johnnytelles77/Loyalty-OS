@@ -117,4 +117,42 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
+    @Operation(summary = "Agregar puntos a un usuario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Puntos agregados correctamente",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/{id}/add-points/{puntos}")
+    public ResponseEntity<UserDTO> addPoints(@PathVariable Long id, @PathVariable int puntos) {
+        try {
+            User user = userService.addPoints(id, puntos);
+            return ResponseEntity.ok(Mapper.toUserDTO(user));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @Operation(summary = "Redimir puntos de un usuario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Puntos redimidos correctamente",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    @PutMapping("/{id}/redeem-points/{puntos}")
+    public ResponseEntity<UserDTO> redeemPoints(@PathVariable Long id, @PathVariable int puntos) {
+        try {
+            User user = userService.redeemPoints(id, puntos);
+            return ResponseEntity.ok(Mapper.toUserDTO(user));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

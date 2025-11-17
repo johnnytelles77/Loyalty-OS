@@ -17,7 +17,6 @@ public class Mapper {
         BusinessDTO dto = new BusinessDTO();
         dto.setNombre(business.getNombre());
         dto.setEmail(business.getEmail());
-        dto.setPassword(business.getPassword());
         dto.setRole(business.getRole());
 
         return dto;

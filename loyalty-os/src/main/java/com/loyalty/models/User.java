@@ -5,7 +5,6 @@ import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
@@ -32,10 +31,9 @@ public class User {
     private int puntos;
 
     @OneToMany(mappedBy="user", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
-    
     @JsonIgnore
     private List<LoyaltyLog> loyaltyLogs = new ArrayList<>();
-    
+
     @ManyToOne
     @JoinColumn(name = "business_id")
     private Business negocio;
