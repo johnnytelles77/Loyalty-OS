@@ -1,11 +1,11 @@
 package com.loyalty.services;
 
+import com.loyalty.dtos.NotificationDTO;
 import com.loyalty.models.LoyaltyLog;
 import com.loyalty.models.Promotion;
 import com.loyalty.repositories.LoyaltyLogRepository;
 import com.loyalty.repositories.PromotionRepository;
 import com.loyalty.repositories.UserRepository;
-import com.loyalty.dtos.NotificationDTO;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -31,92 +31,112 @@ public class PromotionService {
     @Autowired
     private NotificationService notificationService;
 
+    // =========================
+    // REDEEM PROMOTION
+    // =========================
     @Transactional
     public String redeemPromotion(Long userId, Long promotionId) {
-        // Buscar usuario
+
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        // Buscar promoción
         var promotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new EntityNotFoundException("Promotion not found"));
 
-        // Validar que la promoción esté vigente
-        if (promotion.getEndDate() != null && promotion.getEndDate().isBefore(LocalDateTime.now())) {
+        System.out.println("NOW = " + LocalDateTime.now());
+        System.out.println("PROMO(" + promotion.getId() + ") endDate = " + promotion.getEndDate() + " title=" + promotion.getTitle());
+
+        if (promotion.getEndDate() != null &&
+                promotion.getEndDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Promotion has expired");
         }
 
-        // Validar que el usuario tenga suficientes puntos
         if (user.getPuntos() < promotion.getPointsRequired()) {
-            throw new IllegalArgumentException("Not enough points to redeem this promotion");
+            throw new IllegalArgumentException("Not enough points");
         }
 
-        // Descontar puntos al usuario
         user.setPuntos(user.getPuntos() - promotion.getPointsRequired());
         userRepository.save(user);
 
-        // Registrar el movimiento en LoyaltyLog
-        var log = new LoyaltyLog();
+        LoyaltyLog log = new LoyaltyLog();
         log.setUser(user);
         log.setCantidad(promotion.getPointsRequired());
         log.setTipo("REDEEM");
         log.setFecha(LocalDateTime.now());
         loyaltyLogRepository.save(log);
 
-        // Crear mensaje de confirmación
-        String message = String.format(
-                "🎁 You have redeemed the promotion '%s' for %d points! You now have %d points left.",
-                promotion.getTitle(),
-                promotion.getPointsRequired(),
-                user.getPuntos()
-        );
+        // (opcional) notificación
+        // NotificationDTO notification = new NotificationDTO();
+        // notification.setChannel("SMS");
+        // notification.setRecipient(user.getTelefono());
+        // notification.setMessage("Promotion redeemed successfully");
+        // notificationService.sendNotification(notification);
 
-        // Enviar notificación al usuario (SMS)
-        NotificationDTO notification = new NotificationDTO();
-        notification.setChannel("SMS");
-        notification.setRecipient(user.getTelefono());
-        notification.setMessage(message);
-        notificationService.sendNotification(notification);
-
-        return message;
+        return "Promotion redeemed successfully";
     }
 
+    // =========================
+    // READ
+    // =========================
     public List<Promotion> getAll() {
         return promotionRepository.findAll();
     }
 
     public Promotion getById(Long id) {
         return promotionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Promotion not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Promotion not found"));
     }
 
     public List<Promotion> getByBusinessId(Long businessId) {
         return promotionRepository.findByBusinessId(businessId);
     }
 
+    // =========================
+    // CREATE
+    // =========================
     public Promotion create(Promotion promotion) {
-        promotion.setStartDate(promotion.getStartDate() != null ? promotion.getStartDate() : LocalDateTime.now());
+        promotion.setStartDate(
+                promotion.getStartDate() != null ? promotion.getStartDate() : LocalDateTime.now()
+        );
         return promotionRepository.save(promotion);
     }
 
-    public Promotion update(Long id, Promotion updated) {
+    // =========================
+    // UPDATE (con validación de negocio)
+    // =========================
+    public Promotion update(Long id, Promotion updated, Long businessId) {
+
         Promotion promo = promotionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Promotion not found"));
+
+        if (promo.getBusinessId() == null || !promo.getBusinessId().equals(businessId)) {
+            throw new IllegalArgumentException("Cannot update another business promotion");
+        }
 
         promo.setTitle(updated.getTitle());
         promo.setDescription(updated.getDescription());
         promo.setPointsRequired(updated.getPointsRequired());
         promo.setStartDate(updated.getStartDate());
         promo.setEndDate(updated.getEndDate());
-        promo.setBusinessId(updated.getBusinessId());
+
+        // no permitimos cambiar dueño
+        promo.setBusinessId(businessId);
 
         return promotionRepository.save(promo);
     }
 
-    public void delete(Long id) {
-        if (!promotionRepository.existsById(id)) {
-            throw new EntityNotFoundException("Promotion not found");
+    // =========================
+    // DELETE (con validación de negocio)
+    // =========================
+    public void delete(Long id, Long businessId) {
+
+        Promotion promo = promotionRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Promotion not found"));
+
+        if (promo.getBusinessId() == null || !promo.getBusinessId().equals(businessId)) {
+            throw new IllegalArgumentException("Cannot delete another business promotion");
         }
-        promotionRepository.deleteById(id);
+
+        promotionRepository.delete(promo);
     }
 }
