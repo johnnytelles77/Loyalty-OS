@@ -1,17 +1,14 @@
 package com.loyalty.controllers;
 
+import com.loyalty.config.JwtUtil;
+import com.loyalty.dtos.PromotionResponseDTO;
 import com.loyalty.models.Promotion;
 import com.loyalty.services.PromotionService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,13 +20,9 @@ public class PromotionController {
     @Autowired
     private PromotionService promotionService;
 
-    @Operation(summary = "Redeem a promotion for a user")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Promotion redeemed successfully"),
-            @ApiResponse(responseCode = "400", description = "Not enough points or expired promotion"),
-            @ApiResponse(responseCode = "404", description = "User or promotion not found"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/redeem")
     public ResponseEntity<String> redeem(@RequestParam Long userId, @RequestParam Long promotionId) {
         try {
@@ -44,40 +37,61 @@ public class PromotionController {
         }
     }
 
-    @Operation(summary = "Get all promotions")
     @GetMapping
     public ResponseEntity<List<Promotion>> getAll() {
         return ResponseEntity.ok(promotionService.getAll());
     }
 
-    @Operation(summary = "Get promotion by ID")
     @GetMapping("/{id}")
     public ResponseEntity<Promotion> getById(@PathVariable Long id) {
         return ResponseEntity.ok(promotionService.getById(id));
     }
 
-    @Operation(summary = "Get promotions by Business ID")
-    @GetMapping("/business/{businessId}")
-    public ResponseEntity<List<Promotion>> getByBusinessId(@PathVariable Long businessId) {
+    // ✅ Promos del negocio desde JWT
+    @GetMapping("/business/my")
+    public ResponseEntity<List<Promotion>> getMyPromotions(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "").trim();
+        Long businessId = jwtUtil.extractBusinessId(token);
         return ResponseEntity.ok(promotionService.getByBusinessId(businessId));
     }
 
-    @Operation(summary = "Create a new promotion")
+    // ✅ Create usando DTO + JWT, setea businessId siempre
     @PostMapping
-    public ResponseEntity<Promotion> create(@RequestBody Promotion promotion) {
-        return new ResponseEntity<>(promotionService.create(promotion), HttpStatus.CREATED);
+    public ResponseEntity<PromotionResponseDTO> create(
+            @RequestBody Promotion promotion,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "").trim();
+        Long businessId = jwtUtil.extractBusinessId(token);
+
+        promotion.setBusinessId(businessId);
+
+        Promotion saved = promotionService.create(promotion);
+        return new ResponseEntity<>(PromotionResponseDTO.from(saved), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Update a promotion by ID")
     @PutMapping("/{id}")
-    public ResponseEntity<Promotion> update(@PathVariable Long id, @RequestBody Promotion updated) {
-        return ResponseEntity.ok(promotionService.update(id, updated));
+    public ResponseEntity<Promotion> update(
+            @PathVariable Long id,
+            @RequestBody Promotion updated,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "").trim();
+        Long businessId = jwtUtil.extractBusinessId(token);
+
+        Promotion promotion = promotionService.update(id, updated, businessId);
+        return ResponseEntity.ok(promotion);
     }
 
-    @Operation(summary = "Delete a promotion by ID")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        promotionService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @RequestHeader("Authorization") String authHeader) {
+
+        String token = authHeader.replace("Bearer ", "").trim();
+        Long businessId = jwtUtil.extractBusinessId(token);
+
+        promotionService.delete(id, businessId);
         return ResponseEntity.noContent().build();
     }
 }
