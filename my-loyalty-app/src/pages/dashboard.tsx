@@ -1,19 +1,22 @@
 'use client';
+
 import React, { useState } from 'react';
-import Navbar from '../components/Navbar';
-import AddPoints from '../components/AddPoints';
-import History from '../pages/history';
-import DashboardHome from '../components/DashboardHome';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
-import Clients from '../components/Clients';
 
-type MenuOption = 'home' | 'addPoints' | 'history' | 'clients';
+import AppLayout from '../components/layouts/AppLayout';
+
+import AddPoints from '../components/AddPoints';
+import History from './history';
+import DashboardHome from '../components/DashboardHome';
+import Clients from '../components/Clients';
+import PromotionsList from '../components/PromotionsList';
+
+type MenuOption = 'home' | 'addPoints' | 'history' | 'clients' | 'promotions';
 
 export default function Dashboard() {
   const [activeMenu, setActiveMenu] = useState<MenuOption>('home');
-
-  const { logout, business } = useAuth(); // 🔑 usamos el contexto
+  const { logout, business } = useAuth();
   const router = useRouter();
 
   const renderContent = () => {
@@ -24,30 +27,25 @@ export default function Dashboard() {
         return <History />;
       case 'clients':
         return <Clients />;
+      case 'promotions':
+        return <PromotionsList />;
       default:
         return <DashboardHome />;
     }
   };
 
-  // ✅ Cerrar sesión real
   const handleLogout = () => {
-    logout();               // borra token + estado
-    router.push('/login');  // vuelve al login
+    logout();
+    router.push('/login');
   };
 
   return (
-    <div className="min-h-screen bg-beige-50 font-sans text-gray-800">
-      {/* Navbar */}
-      <Navbar
-        businessName={business?.nombre ?? ''}
-        onLogout={handleLogout}
-        onSelectPage={(page: MenuOption) => setActiveMenu(page)}
-      />
-
-      {/* Contenido principal */}
-      <main className="pt-6 px-6 md:px-12">
-        {renderContent()}
-      </main>
-    </div>
+    <AppLayout
+      businessName={business?.nombre}
+      onLogout={handleLogout}
+      onSelectPage={(page: MenuOption) => setActiveMenu(page)}
+    >
+      {renderContent()}
+    </AppLayout>
   );
 }
