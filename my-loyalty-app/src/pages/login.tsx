@@ -1,71 +1,70 @@
 'use client';
+
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import Button from '../components/Button';
-import FormInput from '../components/FormInput';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import AuthLayout from '../components/layouts/AuthLayout';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await login(email, password);
-      router.push('/dashboard'); // redirige automáticamente al dashboard
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert('Error al iniciar sesión');
-      }
+      router.push('/dashboard');
+    } catch (err: any) {
+      alert(err?.message || 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
-      <h1 className="text-3xl font-bold mb-6">LoyaltyOS</h1>
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to manage your clients, points and promotions."
+      bottomLink={{ text: 'No account?', href: '/register-business', label: 'Create one' }}
+    >
+      <form onSubmit={onSubmit} className="space-y-3">
+        <div>
+          <label className="text-sm font-medium text-[var(--text-primary)]">Email</label>
+          <input
+            className="mt-1 w-full rounded-xl border border-[var(--border-default)] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--primary-soft)]"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@business.com"
+            required
+          />
+        </div>
 
-      <form
-        onSubmit={handleLogin}
-        className="bg-white p-8 rounded shadow-md w-80 flex flex-col gap-4"
-      >
-        <FormInput
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Usuario / Email"
-          required
-        />
-        <FormInput
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          required
-        />
-        <Button
-          text={loading ? 'Iniciando...' : 'Iniciar Sesión'}
+        <div>
+          <label className="text-sm font-medium text-[var(--text-primary)]">Password</label>
+          <input
+            className="mt-1 w-full rounded-xl border border-[var(--border-default)] bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--primary-soft)]"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button
           type="submit"
           disabled={loading}
-        />
+          className="w-full rounded-xl bg-[var(--primary)] text-white py-2.5 text-sm font-semibold hover:bg-[var(--primary-hover)] transition disabled:opacity-60"
+        >
+          {loading ? 'Signing in...' : 'Sign in'}
+        </button>
       </form>
-
-      <p className="mt-4 text-sm">
-        ¿No tienes cuenta?{' '}
-        <Link href="/register-business" className="text-blue-600">
-          Registrarse
-        </Link>
-      </p>
-    </div>
+    </AuthLayout>
   );
 }
